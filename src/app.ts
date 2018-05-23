@@ -39,7 +39,7 @@ bot.dialog("/", (session) => {
 });
 
 
-// -- HTTP Server deifnition --- //
+// -- HTTP Server definition --- //
 
 const server = restify.createServer();
 server.use(restify.plugins.queryParser());
