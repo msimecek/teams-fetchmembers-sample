@@ -1,0 +1,22 @@
+{
+  "name": "sample-fetch-members",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Martin Simecek",
+  "license": "MIT",
+  "dependencies": {
+    "botbuilder": "^3.15.0",
+    "botbuilder-teams": "^0.1.7",
+    "dotenv": "^5.0.1",
+    "redis": "^2.8.0",
+    "restify": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/redis": "^2.8.6",
+    "@types/restify": "^5.0.8"
+  }
+}
