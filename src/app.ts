@@ -49,7 +49,7 @@ server.listen(process.env.port || process.env.PORT || 3979, () => {
 
 server.post("/api/messages", connector.listen());
 
-server.get("/api/users", (req, res, next) => {
+server.get("/api/users", async (req, res, next) => {
     // get team ID from query string
     if (req.query.teamId == undefined) {
         res.send(500, "Please provide the teamId parameter.");
@@ -59,18 +59,28 @@ server.get("/api/users", (req, res, next) => {
     const teamId: string = req.query.teamId;
 
     // fetch conversation ID && serviceUrl from cache
-    cache.get(teamId, function(err, result) {
-        const convData = JSON.parse(result);
-
-        // get user list
-        connector.fetchMembers(convData.serviceUrl, convData.conversationId, (err, result) => {
+    const getCacheKeyAsync = new Promise<{serviceUrl: string, conversationId: string}>((resolve, reject) => {
+        cache.get(teamId, function(err, result) {
             if (err) {
-                console.log('error: ', err);
-            } else {
-                // return the list to client
-                res.send(200, result, {"Content-Type": "application/json"});
+                reject("Error getting data from Redis.")
             }
+            else {
+                const convData = JSON.parse(result);
+                resolve(convData);
+            }
+            
         });
+    });
 
+    const cdata = await getCacheKeyAsync;
+
+    // get user list
+    connector.fetchMembers(cdata.serviceUrl, cdata.conversationId, (err, result) => {
+        if (err) {
+            console.log('error: ', err);
+        } else {
+            // return the list to client
+            res.send(200, result, {"Content-Type": "application/json"});
+        }
     });
 });
