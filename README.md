@@ -7,7 +7,8 @@ intro here :)
 To use this sample you need to provision several resources in [Microsoft Azure](https://azure.microsoft.com) first:
 
 1. [Bot Channels Registration](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-quickstart-registration?view=azure-bot-service-3.0) - make note of the **application ID** & **key**.
-1. [Redis Cache](https://docs.microsoft.com/en-us/azure/redis-cache/cache-nodejs-get-started)  make not of the **key** & **hostname**.
+1. [Redis Cache](https://docs.microsoft.com/en-us/azure/redis-cache/cache-nodejs-get-started)  make note of the **key** & **hostname**.
+1. [TypeScript](https://www.typescriptlang.org/#download-links)
 
 You will also need a [Microsoft Teams](https://teams.microsoft.com) team and permissions to [sideload packages](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/apps/apps-upload) to this team.
 
