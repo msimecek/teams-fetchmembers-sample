@@ -51,36 +51,56 @@ server.post("/api/messages", connector.listen());
 
 server.get("/api/users", async (req, res, next) => {
     // get team ID from query string
-    if (req.query.teamId == undefined) {
-        res.send(500, "Please provide the teamId parameter.");
+    if (req.query.teamId == undefined || req.query.teamId === "") {
+        res.send(500, "Please provide the teamId parameter value.");
         return;
     }
-
+    
+    // ask Redis for channelId and serviceUrl for specified team
     const teamId: string = req.query.teamId;
+    let cdata: ICacheData;
+    try {
+        cdata = await getCacheKeyAsync(teamId);
 
-    // fetch conversation ID && serviceUrl from cache
-    const getCacheKeyAsync = new Promise<{serviceUrl: string, conversationId: string}>((resolve, reject) => {
-        cache.get(teamId, function(err, result) {
+        // get user list
+        connector.fetchMembers(cdata.serviceUrl, cdata.conversationId, (err, result) => {
             if (err) {
-                reject("Error getting data from Redis.")
+                console.log('error: ', err);
+            } else {
+                // return the list to client
+                res.send(200, result, {"Content-Type": "application/json"});
             }
+        });
+    }
+    catch (ex) {
+        res.send("There was a problem while fetching members: " + ex)        
+    }
+});
+
+// helper function to return data from cache using Promises
+function getCacheKeyAsync(teamId: string): Promise<ICacheData> 
+{
+    return new Promise<ICacheData>((resolve, reject) => 
+    {
+        cache.get(teamId, function(err, result) {
+            // something wrong happened with Redis
+            if (err) {
+                reject("Error getting data from Redis.");
+            }
+            // or redis succeeded, but key was not present
+            else if (result == null) {
+                reject("Key was not found in the cache.");
+            }
+            // or data retrieved successfuly
             else {
                 const convData = JSON.parse(result);
                 resolve(convData);
             }
-            
         });
     });
+}
 
-    const cdata = await getCacheKeyAsync;
-
-    // get user list
-    connector.fetchMembers(cdata.serviceUrl, cdata.conversationId, (err, result) => {
-        if (err) {
-            console.log('error: ', err);
-        } else {
-            // return the list to client
-            res.send(200, result, {"Content-Type": "application/json"});
-        }
-    });
-});
+interface ICacheData {
+    conversationId: string;
+    serviceUrl: string;
+}
