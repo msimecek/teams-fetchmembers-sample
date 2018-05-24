@@ -1,6 +1,17 @@
 # Microsoft Teams fetchMembers() sample - Node.js
 
-intro here :)
+This sample demonstrates how to get on-demand list of members of a particular team in Microsoft Teams. In this scenario the team owner is sideloading an app to Teams in order to use a *configurable tab*. When the tab is loaded, it needs to get a list of members for further processing. This task can be generalized to an external API call.
+
+1. A *chatbot* exposes two HTTP endpoints: `(POST) /api/messages` for incoming messages and `(GET) /api/users` for getting the on-demand user list.
+1. When application package is sideloaded, *chatbot* gets the `conversationUpdate` message.
+1. It extracts `teamId`, `conversationId` and `serviceUrl` from this message.
+1. It stores these values in *Azure Redis cache* with `teamId` as key.
+1. When *external resource* (such as the tab) wants to get the user list, it calls the `/api/users` endpoint with `teamId` as URL parameter.
+1. *Chatbot* asks Redis cache for `conversationId` and `serviceUrl`.
+1. And then calls `fechMembers()` with these values.
+1. Team roster is returned as JSON.
+
+See the [Microsoft Teams documentation](https://docs.microsoft.com/en-us/microsoftteams/platform/concepts/bots/bots-context#fetching-the-team-roster) for more details on `fetchMembers`.
 
 ## Prerequisites
 
